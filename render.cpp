@@ -49,7 +49,7 @@ void drawLine(int x1,int y1, int x2, int y2){
     glEnd();
 }
 
-void drawObstacles(int x, int y, string color){
+void drawBlock(int x, int y, string color){
 
     //check color
     float pixel_color[3];
@@ -58,11 +58,11 @@ void drawObstacles(int x, int y, string color){
     if(round(pixel_color[0])!=1 or round(pixel_color[1])!=1 or round(pixel_color[2])!=1) return;
 
     if(START==false){
-        color = "blue";
+        color = "blue";     //******start*****
         START=true;
     }
     else if(GOAL==false){
-        color = "red";
+        color = "red";      //******goal*****
         GOAL=true;
     }
 
@@ -125,7 +125,7 @@ void mouseClick(int button, int state, int x, int y){
     {
         int xi = x;
         int yi = DIM-y;
-        drawObstacles(xi, yi, "black");
+        drawBlock(xi, yi, "black");     //******obstacles******
     }
 }
 
