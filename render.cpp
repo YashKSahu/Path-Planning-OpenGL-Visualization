@@ -36,9 +36,9 @@ void drawGrids(int size){
         
         // Maze Boundaries
         glRecti(i, 0, i+size, size);
-        glRecti(i, DIM-size, i+400, size+DIM-size);
+        glRecti(i, DIM-size, i+size, size+DIM-size);
         glRecti(0, i, size, i+size);
-        glRecti(DIM-size, i, size+DIM-size, i+400);
+        glRecti(DIM-size, i, size+DIM-size, i+size);
     }
 }
 
