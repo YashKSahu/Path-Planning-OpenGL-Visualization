@@ -8,6 +8,9 @@ float r,g,b;
 int DIM=720;
 int GRID_SIZE=30;
 
+bool START=false;
+bool GOAL=false;
+
 vector<int> grids;
 
 void init(){
@@ -18,14 +21,16 @@ void init(){
 }
 
 void setColor(string color){
-    if(color=="black")
+    if(color=="black")              // obstacles and boundaries
         glColor3f(0.0, 0.0, 0.0);
-    if(color=="white")
+    if(color=="white")              // free, movable space
         glColor3f(1.0, 1.0, 1.0);
-    if(color=="red")
+    if(color=="red")                // goal
         glColor3f(1.0, 0.0, 0.0);
-    if(color=="green")
+    if(color=="green")              // path
         glColor3f(0.0, 1.0, 0.0);
+    if(color=="blue")               // start
+        glColor3f(0.0, 0.0, 1.0);
     return;
 }
 
@@ -44,12 +49,28 @@ void drawLine(int x1,int y1, int x2, int y2){
     glEnd();
 }
 
-void drawObstacles(int x, int y){
+void drawObstacles(int x, int y, string color){
+
+    //check color
+    float pixel_color[3];
+    glReadPixels(x,y,1.0,1.0,GL_RGB,GL_FLOAT,pixel_color);
+    // cout<<pixel_color[0]<<" "<<pixel_color[1]<<" "<<pixel_color[2]<<"\n";
+    if(round(pixel_color[0])!=1 or round(pixel_color[1])!=1 or round(pixel_color[2])!=1) return;
+
+    if(START==false){
+        color = "blue";
+        START=true;
+    }
+    else if(GOAL==false){
+        color = "red";
+        GOAL=true;
+    }
+
     auto it_x = lower_bound(grids.begin(), grids.end(),x);
     x = *it_x-GRID_SIZE;
     auto it_y = lower_bound(grids.begin(), grids.end(),y);
     y = *it_y-GRID_SIZE;
-    setColor("black");
+    setColor(color);
     glRecti(x, y+1, x+GRID_SIZE-1, y+GRID_SIZE);
     glFlush();
 }
@@ -71,35 +92,20 @@ void drawGrids(int GRID_SIZE){
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    setColor("black");
+    setColor("white");
 
     //pre-processing
-    for(int i=0; i<DIM; i=i+GRID_SIZE) grids.push_back(i);
-    
+    for(int i=0; i<DIM; i=i+GRID_SIZE){
+        grids.push_back(i);
+        // cout<<i<<" ";
+    }
+    // cout<<"\n";
+
+    // draw grids and its boundaries
     drawGrids(GRID_SIZE);
-    // drawRandomObstacles(10);
 
     glFlush();
 }
-
-
-// void display(){
-//     glClear(GL_COLOR_BUFFER_BIT);
-//     glColor3f(r/10,g/10,b/10);  // random colors
-    
-//     // Axis
-//     glBegin(GL_LINES);
-//         glVertex2d(HEIGHT/2,WIDTH);
-//         glVertex2d(HEIGHT/2, 0);
-
-//         glVertex2d(0,WIDTH/2);
-//         glVertex2d(HEIGHT,WIDTH/2);
-//     glEnd();
-
-//     // drawLogic(center_x, center_y, params);
-
-//     glFlush();
-// }
 
 // void mouseClicks(int button, int state, int x, int y){
 //     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
@@ -119,8 +125,7 @@ void mouseClick(int button, int state, int x, int y){
     {
         int xi = x;
         int yi = DIM-y;
-        // cout<<x<<" "<<y<<"\n";
-        drawObstacles(xi, yi);
+        drawObstacles(xi, yi, "black");
     }
 }
 
