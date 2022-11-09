@@ -1,10 +1,14 @@
 #include <GL/glut.h>
 #include <bits/stdc++.h>
+using namespace std;
 
 int onMouse;
 float r,g,b;
 // int HEIGHT=720,WIDTH=720;
 int DIM=720;
+int GRID_SIZE=20;
+
+vector<int> grids;
 
 void init(){
     glClearColor(1,1,1,0);  //black background
@@ -28,17 +32,26 @@ void drawLine(int x1,int y1, int x2, int y2){
     glEnd();
 }
 
-void drawGrids(int size){
+void drawObstacles(int x, int y){
+    auto it_x = lower_bound(grids.begin(), grids.end(),x);
+    x = *it_x-GRID_SIZE;
+    auto it_y = lower_bound(grids.begin(), grids.end(),y);
+    y = *it_y-GRID_SIZE;
+    glRecti(x, y, x+GRID_SIZE, y+GRID_SIZE);
+    glFlush();
+}
+
+void drawGrids(int GRID_SIZE){
     glColor3f(0.0, 0.0, 0);
-    for(int i=0; i<=DIM-size; i=i+size){
+    for(int i=0; i<=DIM-GRID_SIZE; i=i+GRID_SIZE){
         drawLine(i,0,i,DIM);
         drawLine(0,i,DIM,i);
         
         // Maze Boundaries
-        glRecti(i, 0, i+size, size);
-        glRecti(i, DIM-size, i+size, size+DIM-size);
-        glRecti(0, i, size, i+size);
-        glRecti(DIM-size, i, size+DIM-size, i+size);
+        glRecti(i, 0, i+GRID_SIZE, GRID_SIZE);
+        glRecti(i, DIM-GRID_SIZE, i+GRID_SIZE, GRID_SIZE+DIM-GRID_SIZE);
+        glRecti(0, i, GRID_SIZE, i+GRID_SIZE);
+        glRecti(DIM-GRID_SIZE, i, GRID_SIZE+DIM-GRID_SIZE, i+GRID_SIZE);
     }
 }
 
@@ -47,9 +60,11 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 0.0, 1.0);
 
-    //    glRecti(25, 25, 400, 400);
-
-    drawGrids(20);
+    //pre-processing
+    for(int i=0; i<DIM; i=i+GRID_SIZE) grids.push_back(i);
+    
+    drawGrids(GRID_SIZE);
+    // drawRandomObstacles(10);
 
     glFlush();
 }
@@ -73,17 +88,27 @@ void display(void)
 //     glFlush();
 // }
 
-void mouseClicks(int button, int state, int x, int y){
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        onMouse = 1;
-    }
-    if(onMouse == 1){
+// void mouseClicks(int button, int state, int x, int y){
+//     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+//         onMouse = 1;
+//     }
+//     if(onMouse == 1){
         
-        r=rand()%9;
-        g=rand()%9;
-        b=rand()%9;
+//         r=rand()%9;
+//         g=rand()%9;
+//         b=rand()%9;
+//     }
+//     glutPostRedisplay();
+// }
+
+void mouseClick(int button, int state, int x, int y){
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        int xi = x;
+        int yi = DIM-y;
+        // cout<<x<<" "<<y<<"\n";
+        drawObstacles(xi, yi);
     }
-    glutPostRedisplay();
 }
 
 int main(int argc, char** argv){
@@ -96,7 +121,7 @@ int main(int argc, char** argv){
     glutInitWindowPosition(100,150);
     glutCreateWindow("Path Planning OpenGL Visualization");
     glutDisplayFunc(display);
-    //glutMouseFunc(mouseClicks);
+    glutMouseFunc(mouseClick);
     init();
     glutMainLoop();
 }
