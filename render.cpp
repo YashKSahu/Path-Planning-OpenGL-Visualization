@@ -6,7 +6,7 @@ int onMouse;
 float r,g,b;
 // int HEIGHT=720,WIDTH=720;
 int DIM=720;
-int GRID_SIZE=20;
+int GRID_SIZE=30;
 
 vector<int> grids;
 
@@ -15,6 +15,18 @@ void init(){
     // glLoadIdentity();
     // gluOrtho2D(0, 640, 0, 480);
     glOrtho(0, DIM, 0, DIM,-1,1);
+}
+
+void setColor(string color){
+    if(color=="black")
+        glColor3f(0.0, 0.0, 0.0);
+    if(color=="white")
+        glColor3f(1.0, 1.0, 1.0);
+    if(color=="red")
+        glColor3f(1.0, 0.0, 0.0);
+    if(color=="green")
+        glColor3f(0.0, 1.0, 0.0);
+    return;
 }
 
 void pointPlot(int x, int y, int center_x, int center_y){
@@ -37,12 +49,13 @@ void drawObstacles(int x, int y){
     x = *it_x-GRID_SIZE;
     auto it_y = lower_bound(grids.begin(), grids.end(),y);
     y = *it_y-GRID_SIZE;
-    glRecti(x, y, x+GRID_SIZE, y+GRID_SIZE);
+    setColor("black");
+    glRecti(x, y+1, x+GRID_SIZE-1, y+GRID_SIZE);
     glFlush();
 }
 
 void drawGrids(int GRID_SIZE){
-    glColor3f(0.0, 0.0, 0);
+    setColor("black");
     for(int i=0; i<=DIM-GRID_SIZE; i=i+GRID_SIZE){
         drawLine(i,0,i,DIM);
         drawLine(0,i,DIM,i);
@@ -58,7 +71,7 @@ void drawGrids(int GRID_SIZE){
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1.0, 0.0, 1.0);
+    setColor("black");
 
     //pre-processing
     for(int i=0; i<DIM; i=i+GRID_SIZE) grids.push_back(i);
