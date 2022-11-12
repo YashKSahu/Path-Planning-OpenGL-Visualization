@@ -1,13 +1,19 @@
+// OpenGL essentials, header files
 #include <GL/glut.h>
+
+// header file to include all C++ headers
 #include <bits/stdc++.h>
 using namespace std;
 
+// header file for path planning algorithm
 #include "path_planning.hpp"
 
 // Creating a shortcut for int, int pair type
 typedef pair<int, int> Pair;
 
+// variable to track mouse location
 int onMouse;
+
 // int HEIGHT=720,WIDTH=720;
 int DIM=720;
 int GRID_BLOCK_SIZE=30;
@@ -17,13 +23,20 @@ int GRID_SIZE = DIM/GRID_BLOCK_SIZE;
 // whether start and goal drawn or not
 bool START=false;
 bool GOAL=false;
+
+// vector pair to hold start and goal indices
 Pair start,goal;
 
+// variable to check search attempt
 bool find_attempt = false;
 
-vector<int> grids;
+// list of pixel grids start locations
+vector<int> pixel_grids;
+
+// matrix of grid indices
 vector<vector<int>> grid(GRID_SIZE , vector<int> (GRID_SIZE, 0));
 
+// Opengl initialization function
 void init(){
     glClearColor(1,1,1,0);  //white background
     // glLoadIdentity();
@@ -31,6 +44,7 @@ void init(){
     glOrtho(0, DIM, 0, DIM,-1,1);
 }
 
+// Function to set pixel color
 void setColor(string color){
     if(color=="black")              // obstacles and boundaries
         glColor3f(0.0, 0.0, 0.0);
@@ -45,6 +59,7 @@ void setColor(string color){
     return;
 }
 
+// Function to get clicked pixel color
 vector<float> getPixelColor(int x, int y){
     vector<float> pixel_color(3);
     float color[3];
@@ -54,6 +69,7 @@ vector<float> getPixelColor(int x, int y){
     return pixel_color;
 }
 
+// Function to draw a point
 void pointPlot(int x, int y, int center_x, int center_y){
     glPointSize(2);
     glBegin(GL_POINTS);
@@ -61,6 +77,7 @@ void pointPlot(int x, int y, int center_x, int center_y){
     glEnd();
 }
 
+// Function to draw line
 void drawLine(int x1,int y1, int x2, int y2){
     glLineWidth(1.0);
     glBegin(GL_LINES);
@@ -69,6 +86,8 @@ void drawLine(int x1,int y1, int x2, int y2){
     glEnd();
 }
 
+// Function to draw rectangle
+//Input = grid indices
 void drawRect(int x,int y){
     int x1=x*GRID_BLOCK_SIZE+1;
     int y1=y*GRID_BLOCK_SIZE+1;
@@ -79,6 +98,7 @@ void drawRect(int x,int y){
     glFlush();
 }
 
+// Function to print grid
 void printGrid(){
     cout<<"\n-------------------\n";
     for(int i = 0; i < GRID_SIZE; i++){
@@ -89,11 +109,13 @@ void printGrid(){
     cout<<"-------------------\n";
 }
 
+// Function to introduce delay in seconds
 void sleep(float seconds){
     int time = 1000*seconds;
     this_thread::sleep_for(chrono::milliseconds(time));
 }
 
+// Function to find path
 void findPath(Pair start, Pair goal){
 
     if(!START or !GOAL){
@@ -107,13 +129,18 @@ void findPath(Pair start, Pair goal){
     1--> The cell is not blocked
     0--> The cell is blocked */
 
+    //intialize array
+    //copying vector data to array,
+    //path planning algo, requires array data type
     array<array<int, 24>, 24> grid_array;
     for(int i = 0; i < GRID_SIZE; i++)
         for(int j = 0; j < GRID_SIZE; j++)
             grid_array[i][j]=grid[i][j];
 
+    // calling path planning algorithm
     aStarSearch(grid_array, start, goal);
 
+    //plotting found path
     setColor("green");
     for(int i=1; i<maze_path.size()-1; ++i){
         // printf("-> (%d,%d) ", maze_path[i].first, maze_path[i].second);
@@ -123,10 +150,12 @@ void findPath(Pair start, Pair goal){
     }
     // cout<<"\n";
 
+    //terminate message
     find_attempt = true;
     cout<<"Path Plotted, please terminate the program.\n";
 }
 
+// Function to draw a block on mouse click
 void drawBlock(int x, int y, string color){
 
     //Variables x and y hold the clicked pointer location
@@ -160,9 +189,9 @@ void drawBlock(int x, int y, string color){
     }
 
     //Get the lower bounds of x and y, to fit the drawn block with grid's block
-    auto it_x = lower_bound(grids.begin(), grids.end(),x);
+    auto it_x = lower_bound(pixel_grids.begin(), pixel_grids.end(),x);
     x = *it_x-GRID_BLOCK_SIZE;
-    auto it_y = lower_bound(grids.begin(), grids.end(),y);
+    auto it_y = lower_bound(pixel_grids.begin(), pixel_grids.end(),y);
     y = *it_y-GRID_BLOCK_SIZE;
     // cout<<x<<" "<<y<<" - "<<*it_x<<" "<<*it_y<<"\n";
 
@@ -178,6 +207,7 @@ void drawBlock(int x, int y, string color){
     // printGrid();
 }
 
+// Function to draw grid lines and obstacle wall around the grid
 void drawGrids(int GRID_BLOCK_SIZE){
     setColor("black");
     for(int i=0; i<=DIM-GRID_BLOCK_SIZE; i=i+GRID_BLOCK_SIZE){
@@ -192,6 +222,7 @@ void drawGrids(int GRID_BLOCK_SIZE){
     }
 }
 
+// Function to display text on screen
 void drawText(int x, int y, float r, float g, float b, string text){
   glColor3f( r, g, b );
   glRasterPos2f(x, y);
@@ -202,6 +233,7 @@ void drawText(int x, int y, float r, float g, float b, string text){
   }
 }
 
+// Main Rendering function
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -209,7 +241,7 @@ void display(void)
 
     //pre-processing
     for(int i=0; i<DIM; i=i+GRID_BLOCK_SIZE){
-        grids.push_back(i);
+        pixel_grids.push_back(i);
         // cout<<i<<" ";
     }
     // cout<<"\n";
@@ -243,6 +275,7 @@ void display(void)
     glFlush();
 }
 
+// Function to track and map mouse clicks to actions
 void mouseClick(int button, int state, int x, int y){
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
@@ -253,6 +286,7 @@ void mouseClick(int button, int state, int x, int y){
     }
 }
 
+// Function main
 int main(int argc, char** argv){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
