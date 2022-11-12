@@ -100,7 +100,7 @@ void tracePath(
     while (!Path.empty()) {
         Pair p = Path.top();
         Path.pop();
-        //printf("-> (%d,%d) ", p.first, p.second);
+        printf("-> (%d,%d) ", p.first, p.second);
         maze_path.push_back(p);
     }
     printf("\n");
