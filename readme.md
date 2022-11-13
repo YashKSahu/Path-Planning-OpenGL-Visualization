@@ -20,3 +20,4 @@ g++ $file -lGL -lGLU -lglut -lGLEW
 
 ## Resources and References
 - [khronos.org/OpenGL](https://registry.khronos.org/OpenGL-Refpages/gl4/)
+- https://www.geeksforgeeks.org/a-search-algorithm/
