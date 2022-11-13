@@ -13,6 +13,7 @@ git clone https://github.com/YashKSahu/Path-Planning-OpenGL-Visualization.git
 ```
 ### Compile and Run
 ```
+cd Path-Planning-OpenGL-Animation/src
 file=render.cpp
 g++ $file -lGL -lGLU -lglut -lGLEW
 ```
